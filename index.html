@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>백령도·연평도 미세먼지 최근 48시간</title>
+    <meta name="description" content="백령도와 연평도 측정소의 PM10 및 PM2.5 최근 48시간 데이터 시계열 그래프">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>백령도·연평도 미세먼지 최근 48시간</h1>
+            <div class="update-info">
+                <span id="lastUpdate">데이터 로딩 중...</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="chart-section">
+                <h2>PM2.5 (초미세먼지)</h2>
+                <div class="chart-container">
+                    <canvas id="pm25Chart"></canvas>
+                </div>
+                <div class="error-message" id="pm25Error"></div>
+            </section>
+
+            <section class="chart-section">
+                <h2>PM10 (미세먼지)</h2>
+                <div class="chart-container">
+                    <canvas id="pm10Chart"></canvas>
+                </div>
+                <div class="error-message" id="pm10Error"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>데이터 출처: 에어코리아 (한국환경공단)</p>
+            <p>자동 갱신: 60분마다</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
