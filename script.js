@@ -21,10 +21,14 @@ const API_CONFIG = {
 let pm25Chart = null;
 let pm10Chart = null;
 
+// 인천 데이터 표시 상태
+let showIncheon = false;
+
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', () => {
     initCharts();
     fetchData();
+    setupToggleButtons();
     // 60분마다 자동 갱신
     setInterval(fetchData, 60 * 60 * 1000);
 });
@@ -44,10 +48,10 @@ function initCharts() {
                 position: 'top',
                 labels: {
                     font: {
-                        size: 14,
+                        size: 11,
                         weight: 'bold'
                     },
-                    padding: 15,
+                    padding: 10,
                     usePointStyle: true
                 }
             },
@@ -74,9 +78,29 @@ function initCharts() {
                 time: {
                     unit: 'hour',
                     displayFormats: {
-                        hour: 'MM/dd HH:mm'
+                        hour: 'HH'
                     },
                     tooltipFormat: 'yyyy-MM-dd HH:mm'
+                },
+                ticks: {
+                    callback: function (value, index, ticks) {
+                        const date = new Date(value);
+                        const hour = date.getHours();
+
+                        // 첫 번째 틱이거나 0시인 경우 날짜 포함
+                        if (index === 0 || hour === 0) {
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const hourStr = String(hour).padStart(2, '0');
+                            return `${month}/${day} ${hourStr}`;
+                        }
+
+                        // 그 외에는 시간만 표시
+                        return String(hour).padStart(2, '0');
+                    },
+                    maxRotation: 0,
+                    autoSkip: true,
+                    autoSkipPadding: 10
                 },
                 title: {
                     display: true,
@@ -143,6 +167,12 @@ async function fetchData() {
             const color = API_CONFIG.colors[index];
 
             if (stationData && stationData.length > 0) {
+                // 인천 데이터는 토글 상태에 따라 추가
+                const isIncheon = stationName.includes('인천');
+                if (isIncheon && !showIncheon) {
+                    return; // 인천 데이터 스킵
+                }
+
                 // PM2.5 데이터셋
                 pm25Data.push({
                     label: stationName,
@@ -154,8 +184,8 @@ async function fetchData() {
                     backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
                     borderWidth: 2,
                     tension: 0.3,
-                    pointRadius: 3,
-                    pointHoverRadius: 6
+                    pointRadius: 0,
+                    pointHoverRadius: 5
                 });
 
                 // PM10 데이터셋
@@ -169,8 +199,8 @@ async function fetchData() {
                     backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
                     borderWidth: 2,
                     tension: 0.3,
-                    pointRadius: 3,
-                    pointHoverRadius: 6
+                    pointRadius: 0,
+                    pointHoverRadius: 5
                 });
             }
         });
@@ -342,4 +372,40 @@ function showError(elementId, message) {
 function hideError(elementId) {
     const errorElement = document.getElementById(elementId);
     errorElement.classList.remove('show');
+}
+
+// 토글 버튼 설정
+function setupToggleButtons() {
+    const togglePM25 = document.getElementById('toggleIncheonPM25');
+    const togglePM10 = document.getElementById('toggleIncheonPM10');
+
+    togglePM25.addEventListener('click', () => {
+        showIncheon = !showIncheon;
+        updateToggleButtons();
+        fetchData();
+    });
+
+    togglePM10.addEventListener('click', () => {
+        showIncheon = !showIncheon;
+        updateToggleButtons();
+        fetchData();
+    });
+}
+
+// 토글 버튼 상태 업데이트
+function updateToggleButtons() {
+    const togglePM25 = document.getElementById('toggleIncheonPM25');
+    const togglePM10 = document.getElementById('toggleIncheonPM10');
+
+    if (showIncheon) {
+        togglePM25.classList.add('active');
+        togglePM10.classList.add('active');
+        togglePM25.textContent = '인천 숨김';
+        togglePM10.textContent = '인천 숨김';
+    } else {
+        togglePM25.classList.remove('active');
+        togglePM10.classList.remove('active');
+        togglePM25.textContent = '인천 표시';
+        togglePM10.textContent = '인천 표시';
+    }
 }

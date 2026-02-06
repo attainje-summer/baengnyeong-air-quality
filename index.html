@@ -23,7 +23,10 @@
 
         <main>
             <section class="chart-section">
-                <h2>PM2.5 (초미세먼지)</h2>
+                <div class="chart-header">
+                    <h2>PM2.5 (초미세먼지)</h2>
+                    <button class="toggle-btn" id="toggleIncheonPM25">인천 표시</button>
+                </div>
                 <div class="chart-container">
                     <canvas id="pm25Chart"></canvas>
                 </div>
@@ -31,7 +34,10 @@
             </section>
 
             <section class="chart-section">
-                <h2>PM10 (미세먼지)</h2>
+                <div class="chart-header">
+                    <h2>PM10 (미세먼지)</h2>
+                    <button class="toggle-btn" id="toggleIncheonPM10">인천 표시</button>
+                </div>
                 <div class="chart-container">
                     <canvas id="pm10Chart"></canvas>
                 </div>

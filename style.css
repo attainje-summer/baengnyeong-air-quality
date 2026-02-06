@@ -30,7 +30,7 @@ header {
 }
 
 h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
@@ -62,10 +62,43 @@ main {
 
 .chart-section h2 {
     color: #667eea;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 3px solid #667eea;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.toggle-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.toggle-btn:active {
+    transform: translateY(0);
+}
+
+.toggle-btn.active {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
 }
 
 .chart-container {
@@ -105,7 +138,7 @@ footer p {
     }
 
     h1 {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
     }
 
     .container {
@@ -125,7 +158,12 @@ footer p {
     }
 
     .chart-section h2 {
-        font-size: 1.2rem;
+        font-size: 1rem;
+    }
+
+    .toggle-btn {
+        font-size: 0.75rem;
+        padding: 6px 12px;
     }
 
     .chart-container {
@@ -135,7 +173,7 @@ footer p {
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 1.2rem;
+        font-size: 0.95rem;
     }
 
     .chart-container {
@@ -143,6 +181,15 @@ footer p {
     }
 
     .update-info {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
+    }
+
+    .chart-section h2 {
+        font-size: 0.9rem;
+    }
+
+    .toggle-btn {
+        font-size: 0.7rem;
+        padding: 5px 10px;
     }
 }
