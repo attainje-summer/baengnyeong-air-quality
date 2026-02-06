@@ -2,7 +2,7 @@
 const API_CONFIG = {
     // API 키 (디코딩된 형태 - URLSearchParams가 자동으로 인코딩함)
     serviceKey: 'o7pLjsdMALo1AOiAR3G1WmgQlimAHYIELZJDTarHiBgLGLQmsVP5gvKNIw0ZXtUkX5efG7+7K7xshYIn9S/ejQ==',
-    stationUrl: 'http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty',
+    stationUrl: 'https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty',
     sidoUrl: 'https://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst',
     stations: ['백령도', '연평도', 'SEOUL_AVG', '중구', '석모리'],
     stationLabels: ['백령도', '연평도', '서울(평균)', '인천(중구)', '인천(강화)'],
