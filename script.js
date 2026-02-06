@@ -1,9 +1,18 @@
 // 에어코리아 API 설정
 const API_CONFIG = {
-    // API 키 (에어코리아 OpenAPI)
-    serviceKey: 'o7pLjsdMALo1AOiAR3G1WmgQlimAHYIELZJDTarHiBgLGLQmsVP5gvKNIw0ZXtUkX5efG7%2B7K7xshYIn9S%2FejQ%3D%3D',
-    baseUrl: 'http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty',
-    stations: ['백령도', '연평도'],
+    // API 키 (디코딩된 형태 - URLSearchParams가 자동으로 인코딩함)
+    serviceKey: 'o7pLjsdMALo1AOiAR3G1WmgQlimAHYIELZJDTarHiBgLGLQmsVP5gvKNIw0ZXtUkX5efG7+7K7xshYIn9S/ejQ==',
+    stationUrl: 'http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty',
+    sidoUrl: 'https://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureLIst',
+    stations: ['백령도', '연평도', 'SEOUL_AVG', '중구', '석모리'],
+    stationLabels: ['백령도', '연평도', '서울(평균)', '인천(중구)', '인천(강화)'],
+    colors: [
+        'rgb(255, 99, 132)',   // 백령도 - 빨강
+        'rgb(54, 162, 235)',   // 연평도 - 파랑
+        'rgb(255, 206, 86)',   // 서울 - 노랑
+        'rgb(75, 192, 192)',   // 인천(중구) - 청록
+        'rgb(153, 102, 255)'   // 인천(강화) - 보라
+    ],
     numOfRows: 48,
     returnType: 'json'
 };
@@ -130,8 +139,8 @@ async function fetchData() {
         const pm10Data = [];
 
         allData.forEach((stationData, index) => {
-            const stationName = API_CONFIG.stations[index];
-            const color = index === 0 ? 'rgb(255, 99, 132)' : 'rgb(54, 162, 235)';
+            const stationName = API_CONFIG.stationLabels[index];
+            const color = API_CONFIG.colors[index];
 
             if (stationData && stationData.length > 0) {
                 // PM2.5 데이터셋
@@ -182,6 +191,12 @@ async function fetchData() {
 
 // 측정소별 데이터 가져오기
 async function fetchStationData(stationName) {
+    // 서울 평균 처리
+    if (stationName === 'SEOUL_AVG') {
+        return await fetchSeoulAverage();
+    }
+
+    // 일반 측정소 데이터
     try {
         const params = new URLSearchParams({
             serviceKey: API_CONFIG.serviceKey,
@@ -193,7 +208,7 @@ async function fetchStationData(stationName) {
             ver: '1.0'
         });
 
-        const url = `${API_CONFIG.baseUrl}?${params.toString()}`;
+        const url = `${API_CONFIG.stationUrl}?${params.toString()}`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -203,13 +218,90 @@ async function fetchStationData(stationName) {
         const data = await response.json();
 
         if (data.response && data.response.body && data.response.body.items) {
-            return data.response.body.items;
+            const items = data.response.body.items;
+            // items가 배열이면 그대로 반환, 단일 객체면 배열로 변환
+            return Array.isArray(items) ? items : [items];
         } else {
             console.error(`${stationName} 데이터 형식 오류:`, data);
             return [];
         }
     } catch (error) {
         console.error(`${stationName} 데이터 가져오기 오류:`, error);
+        return [];
+    }
+}
+
+// 서울 평균 데이터 가져오기 (ArpltnStatsSvc API - 이미 계산된 평균값)
+async function fetchSeoulAverage() {
+    try {
+        // PM10과 PM2.5 데이터를 각각 가져오기
+        const pm10Data = await fetchSeoulAverageByItem('PM10');
+        const pm25Data = await fetchSeoulAverageByItem('PM25');
+
+        if (pm10Data.length === 0 || pm25Data.length === 0) {
+            console.error('서울 평균 데이터 없음');
+            return [];
+        }
+
+        // 시간별로 병합
+        const mergedData = pm10Data.map(pm10Item => {
+            const pm25Item = pm25Data.find(item => item.dataTime === pm10Item.dataTime);
+            return {
+                dataTime: pm10Item.dataTime,
+                pm10Value: pm10Item.pm10Value,
+                pm25Value: pm25Item ? pm25Item.pm25Value : '-'
+            };
+        });
+
+        console.log('서울 평균 데이터:', mergedData.length, '개');
+        return mergedData;
+    } catch (error) {
+        console.error('서울 평균 데이터 가져오기 오류:', error);
+        return [];
+    }
+}
+
+// 항목별 서울 평균 데이터 가져오기
+async function fetchSeoulAverageByItem(itemCode) {
+    try {
+        const params = new URLSearchParams({
+            serviceKey: API_CONFIG.serviceKey,
+            returnType: API_CONFIG.returnType,
+            numOfRows: 50,
+            pageNo: 1,
+            itemCode: itemCode,
+            dataGubun: 'HOUR',
+            searchCondition: 'DAILY'
+        });
+
+        const url = `${API_CONFIG.sidoUrl}?${params.toString()}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.response && data.response.body && data.response.body.items) {
+            const items = Array.isArray(data.response.body.items) ? data.response.body.items : [data.response.body.items];
+
+            // 서울 평균값 추출 (이미 계산된 값)
+            const seoulData = items
+                .filter(item => item.seoul)  // seoul 필드가 있는 항목만
+                .map(item => ({
+                    dataTime: item.dataTime,
+                    [itemCode === 'PM10' ? 'pm10Value' : 'pm25Value']: item.seoul
+                }));
+
+            console.log(`서울 ${itemCode} 데이터:`, seoulData.length, '개');
+            return seoulData;
+        } else {
+            console.error(`서울 ${itemCode} 평균 데이터 형식 오류:`, data);
+            return [];
+        }
+    } catch (error) {
+        console.error(`서울 ${itemCode} 평균 데이터 가져오기 오류:`, error);
         return [];
     }
 }

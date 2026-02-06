@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>백령도·연평도 미세먼지 최근 48시간</title>
-    <meta name="description" content="백령도와 연평도 측정소의 PM10 및 PM2.5 최근 48시간 데이터 시계열 그래프">
+    <title>백령도·연평도·서울·인천 미세먼지 최근 48시간</title>
+    <meta name="description" content="백령도, 연평도, 서울(평균), 인천(중구), 인천(강화) 측정소의 PM10 및 PM2.5 최근 48시간 데이터 시계열 그래프">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <header>
-            <h1>백령도·연평도 미세먼지 최근 48시간</h1>
+            <h1>백령도·연평도·서울·인천 미세먼지 최근 48시간</h1>
             <div class="update-info">
                 <span id="lastUpdate">데이터 로딩 중...</span>
             </div>
@@ -44,4 +47,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
